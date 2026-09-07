@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cute Robot Face</title>
+  <style>
+    :root {
+      --neon-cyan: #00f3ff;
+      --neon-glow: rgba(0, 243, 255, 0.65);
+      --neon-soft: rgba(0, 243, 255, 0.2);
+      --eye-bg-deep: #031525;
+      --eye-pupil: #25d4ff;
+      --eye-dark: #004d73;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #02070d;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      cursor: none; /* Skjuler cursor helt for kiosk-skærm */
+    }
+
+    /* Digitale printbaner i siderne inspireret af billedet */
+    .circuit-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: 
+        radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(2, 7, 13, 0.95) 90%),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 80px 80px, 80px 80px;
+    }
+
+    .circuit-lines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.35;
+      filter: drop-shadow(0 0 8px var(--neon-cyan));
+    }
+
+    /* Robotansigtets base med kontinuerlig organisk vejrtrækning */
+    .robot-face {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: min(8vh, 60px);
+      z-index: 10;
+      animation: gentleBreathing 4.5s ease-in-out infinite alternate;
+      transform-origin: center center;
+    }
+
+    @keyframes gentleBreathing {
+      0% {
+        transform: translateY(0px) scale(1);
+      }
+      100% {
+        transform: translateY(-12px) scale(1.015);
+      }
+    }
+
+    .eyes-container {
+      display: flex;
+      align-items: center;
+      gap: min(12vw, 85px);
+      position: relative;
+    }
+
+    .eye-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: min(3vh, 24px);
+    }
+
+    .eyebrow {
+      width: min(28vw, 130px);
+      height: min(2.5vh, 18px);
+      background: #c3f9ff;
+      border-radius: 20px;
+      box-shadow: 
+        0 0 15px var(--neon-cyan),
+        0 0 35px var(--neon-glow);
+      transform-origin: center center;
+      transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    .eye-socket {
+      width: min(38vw, 180px);
+      height: min(32vh, 250px);
+      background: radial-gradient(circle at 50% 50%, var(--eye-bg-deep) 0%, #010a12 85%);
+      border: 4px solid #57edff;
+      border-radius: 95px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        0 0 25px var(--neon-cyan),
+        0 0 60px var(--neon-soft),
+        inset 0 0 30px rgba(0, 243, 255, 0.4);
+      transition: transform 0.12s ease, border-radius 0.3s ease;
+    }
+
+    /* Pupil container som følger blikket */
+    .pupil-track {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .pupil {
+      width: min(25vw, 120px);
+      height: min(20vh, 160px);
+      background: radial-gradient(circle at 45% 40%, #76f6ff 0%, var(--eye-pupil) 45%, var(--eye-dark) 85%);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.8);
+    }
+
+    /* Stor primær lysrefleks */
+    .pupil::before {
+      content: "";
+      position: absolute;
+      top: 16%;
+      left: 18%;
+      width: 32%;
+      height: 35%;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ffffff;
+    }
+
+    /* Mindre sekundær lysrefleks for dybde */
+    .pupil::after {
+      content: "";
+      position: absolute;
+      bottom: 18%;
+      right: 20%;
+      width: 15%;
+      height: 15%;
+      background: #ffffff;
+      border-radius: 50%;
+      opacity: 0.85;
+      box-shadow: 0 0 6px #ffffff;
+    }
+
+    /* Blinke-effekt ved vertikal sammentrækning */
+    .eye-socket.blinking {
+      transform: scaleY(0.04) !important;
+      border-radius: 20px;
+    }
+
+    /* Glad/tilfreds knibe-øjne mode (^ _ ^) */
+    .robot-face.happy .eye-socket {
+      height: min(15vh, 110px);
+      border-radius: 100px 100px 10px 10px;
+      transform: scaleY(0.5);
+    }
+
+    .cheeks-container {
+      position: absolute;
+      width: 120%;
+      display: flex;
+      justify-content: space-between;
+      top: 65%;
+      pointer-events: none;
+    }
+
+    .blush {
+      width: min(12vw, 60px);
+      height: min(3vh, 22px);
+      background: radial-gradient(circle, rgba(255, 120, 200, 0.45) 0%, transparent 75%);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      filter: blur(4px);
+    }
+
+    .robot-face.happy .blush {
+      opacity: 1;
+    }
+
+    /* Den glødende mund */
+    .mouth {
+      width: min(20vw, 95px);
+      height: min(4vh, 32px);
+      border-bottom: 5px solid #82f5ff;
+      border-radius: 0 0 60px 60px;
+      box-shadow: 0 5px 20px var(--neon-cyan);
+      transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Ekstra bredt smil */
+    .robot-face.happy .mouth {
+      width: min(26vw, 130px);
+      height: min(6vh, 48px);
+      border-bottom-width: 7px;
+    }
+
+    /* Taler-tilstand (Mund der animerer synkront med oplæsning) */
+    .robot-face.speaking .mouth {
+      animation: mouthTalking 0.25s ease-in-out infinite alternate;
+      border-radius: 40px 40px 60px 60px;
+      border: 4px solid #82f5ff;
+      background: rgba(0, 243, 255, 0.25);
+      box-shadow: 0 0 25px var(--neon-cyan);
+    }
+
+    @keyframes mouthTalking {
+      0% {
+        height: min(2vh, 16px);
+        width: min(15vw, 75px);
+        transform: scaleY(0.6);
+      }
+      100% {
+        height: min(5.5vh, 46px);
+        width: min(23vw, 110px);
+        transform: scaleY(1.1);
+      }
+    }
+
+    /* Holografisk tale-HUD display */
+    .speech-hud {
+      position: absolute;
+      bottom: max(6vh, 45px);
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      width: min(88vw, 680px);
+      background: rgba(3, 21, 37, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(0, 243, 255, 0.45);
+      border-radius: 20px;
+      padding: 20px 26px;
+      box-shadow: 
+        0 0 35px rgba(0, 243, 255, 0.25),
+        inset 0 0 20px rgba(0, 243, 255, 0.12);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 30;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .speech-hud.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--neon-cyan);
+      font-weight: 700;
+    }
+
+    .hud-badge-dot {
+      width: 8px;
+      height: 8px;
+      background: #00f3ff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #00f3ff;
+      animation: badgePulse 1.2s infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.7); }
+    }
+
+    .hud-headline {
+      font-size: clamp(17px, 2.6vw, 24px);
+      color: #ffffff;
+      font-weight: 600;
+      line-height: 1.45;
+      text-shadow: 0 0 12px rgba(0, 243, 255, 0.6);
+      word-break: break-word;
+    }
+
+    .hud-time {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 1px;
+    }
+
+    /* Diskret scanning-laser der lejlighedsvis fejer henover ansigtet */
+    .scanner-beam {
+      position: absolute;
+      top: -20%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #00f3ff, #ffffff, #00f3ff, transparent);
+      box-shadow: 0 0 20px #00f3ff, 0 0 40px #00f3ff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .scanner-beam.active {
+      animation: scanSweep 2.2s ease-in-out forwards;
+    }
+
+    @keyframes scanSweep {
+      0% {
+        top: -10%;
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.9;
+      }
+      80% {
+        opacity: 0.9;
+      }
+      100% {
+        top: 110%;
+        opacity: 0;
+      }
+    }
+
+    /* Top Sci-Fi Status Bar */
+    .top-status-bar {
+      position: absolute;
+      top: 24px;
+      left: 30px;
+      right: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: clamp(11px, 1.4vw, 15px);
+      letter-spacing: 2px;
+      color: rgba(0, 243, 255, 0.7);
+      font-family: 'Courier New', Courier, monospace;
+      z-index: 40;
+      pointer-events: none;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+      padding-bottom: 12px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .coffee-meter-bar {
+      display: inline-block;
+      width: 55px;
+      height: 9px;
+      background: rgba(0, 243, 255, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+      vertical-align: middle;
+      border: 1px solid rgba(0, 243, 255, 0.4);
+    }
+
+    .coffee-level {
+      height: 100%;
+      width: 22%;
+      background: #ffb703;
+      box-shadow: 0 0 8px #ffb703;
+      transition: width 1s ease;
+    }
+
+    /* Cyber-flue der flyver rundt på skærmen */
+    .cyber-bug {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 14px #00f3ff, 0 0 28px #00f3ff;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .cyber-bug::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 1.5px dashed #00f3ff;
+      border-radius: 50%;
+      animation: spinBug 0.3s linear infinite;
+    }
+
+    @keyframes spinBug {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Special-tilstande for øjnene */
+    /* Hjerte-øjne */
+    .eye-socket.hearts .pupil {
+      background: radial-gradient(circle, #ff2a85 20%, #b5004e 90%) !important;
+      clip-path: path('M 60 25 C 60 10, 45 0, 30 0 C 12 0, 0 16, 0 35 C 0 65, 45 95, 60 115 C 75 95, 120 65, 120 35 C 120 16, 108 0, 90 0 C 75 0, 60 10, 60 25 Z');
+      transform: scale(1.1) !important;
+      animation: heartbeat 0.7s infinite alternate ease-in-out;
+      box-shadow: 0 0 30px #ff2a85 !important;
+    }
+
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.22); }
+    }
+
+    /* Træt / Gabende øjne */
+    .robot-face.sleepy .eye-socket {
+      height: min(10vh, 75px);
+      border-radius: 30px;
+      opacity: 0.85;
+    }
+
+    .robot-face.sleepy .mouth {
+      width: min(15vw, 65px);
+      height: min(6vh, 45px);
+      border-radius: 50%;
+      border: 4px solid #82f5ff;
+      background: rgba(0, 243, 255, 0.15);
+      animation: yawnExpand 2.8s ease-in-out infinite;
+    }
+
+    @keyframes yawnExpand {
+      0%, 100% { transform: scale(0.85); }
+      50% { transform: scale(1.25); }
+    }
+
+    /* Svævende Zzz */
+    .zzz-particle {
+      position: absolute;
+      color: #00f3ff;
+      font-weight: 900;
+      font-size: clamp(20px, 3.5vw, 36px);
+      text-shadow: 0 0 12px var(--neon-cyan);
+      opacity: 0;
+      pointer-events: none;
+      animation: floatZ 3s ease-out forwards;
+      z-index: 35;
+    }
+
+    @keyframes floatZ {
+      0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+      30% { opacity: 0.9; }
+      100% { opacity: 0; transform: translate(50px, -110px) scale(1.5); }
+    }
+
+    /* Glitch / Matrix Tilstand */
+    .robot-face.glitch {
+      animation: glitchShake 0.15s infinite;
+      filter: drop-shadow(-3px 0 red) drop-shadow(3px 0 cyan);
+    }
+
+    @keyframes glitchShake {
+      0% { transform: translate(0); }
+      25% { transform: translate(-5px, 3px); }
+      50% { transform: translate(4px, -2px); }
+      75% { transform: translate(-3px, -4px); }
+      100% { transform: translate(0); }
+    }
+
+    .matrix-overlay {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(0,243,255,0.06) 0px, rgba(0,243,255,0.06) 2px, transparent 2px, transparent 6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 25;
+    }
+
+    .matrix-overlay.active {
+      opacity: 1;
+    }
+
+    /* Pixel solbriller */
+    .sunglasses {
+      position: absolute;
+      top: -120px;
+      width: min(84vw, 420px);
+      height: 70px;
+      background: #060b13;
+      border: 4px solid #00f3ff;
+      box-shadow: 0 0 25px #00f3ff;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 45;
+      transition: top 0.7s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      pointer-events: none;
+    }
+
+    .sunglasses::before, .sunglasses::after {
+      content: '';
+      width: 42%;
+      height: 78%;
+      background: linear-gradient(135deg, rgba(0,243,255,0.7) 0%, transparent 60%);
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+
+    .sunglasses.drop {
+      top: min(10vh, 80px);
+    }
+
+    /* Spontane robot-tankebobler */
+    .thought-bubble {
+      position: absolute;
+      top: 14%;
+      background: rgba(3, 21, 37, 0.9);
+      border: 2px dashed var(--neon-cyan);
+      border-radius: 25px;
+      padding: 12px 24px;
+      color: #bbf7ff;
+      font-size: clamp(14px, 2vw, 19px);
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);
+      opacity: 0;
+      transform: scale(0.85) translateY(10px);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      z-index: 35;
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+      max-width: 80%;
+      text-align: center;
+    }
+
+    .thought-bubble.show {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Circuit grid & sideprint -->
+  <div class="circuit-overlay"></div>
+  <div class="matrix-overlay" id="matrix-lines"></div>
+
+  <!-- Top sci-fi statuslinje -->
+  <div class="top-status-bar">
+    <div class="status-item">
+      <span>AI KERNEL:</span>
+      <span id="sys-status" style="color: #6eff9f;">AKTIV</span>
+    </div>
+    <div class="status-item">
+      <span>KAFFE:</span>
+      <span class="coffee-meter-bar"><span class="coffee-level" id="coffee-bar"></span></span>
+      <span id="coffee-pct">18%</span>
+    </div>
+    <div class="status-item">
+      <span id="live-clock">12:00:00</span>
+    </div>
+  </div>
+
+  <!-- Cyber Flue -->
+  <div class="cyber-bug" id="cyber-bug"></div>
+
+  <!-- Tankeboble -->
+  <div class="thought-bubble" id="thought-bubble">Beep boop...</div>
+
+  <svg class="circuit-lines" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Venstre printbaner -->
+    <path d="M 80 0 V 450 L 180 550 V 900 L 120 960 V 1400 L 190 1470 V 1920" stroke="#00f3ff" stroke-width="2.5" stroke-dasharray="12 6" />
+    <circle cx="180" cy="550" r="5" fill="#00f3ff" />
+    <circle cx="120" cy="960" r="5" fill="#00f3ff" />
+    <circle cx="190" cy="1470" r="5" fill="#00f3ff" />
+
+    <!-- Højre printbaner -->
+    <path d="M 1000 0 V 380 L 910 470 V 850 L 970 910 V 1350 L 890 1430 V 1920" stroke="#00f3ff" stroke-width="2.5" stroke-dasharray="12 6" />
+    <circle cx="910" cy="470" r="5" fill="#00f3ff" />
+    <circle cx="970" cy="910" r="5" fill="#00f3ff" />
+    <circle cx="890" cy="1430" r="5" fill="#00f3ff" />
+  </svg>
+
+  <div class="scanner-beam" id="scanner"></div>
+
+  <main class="robot-face" id="face">
+    <!-- Pixel solbriller til 'Deal with it' mode -->
+    <div class="sunglasses" id="sunglasses"></div>
+
+    <!-- Øjenpar -->
+    <div class="eyes-container">
+      <div class="cheeks-container">
+        <div class="blush"></div>
+        <div class="blush"></div>
+      </div>
+
+      <!-- Venstre øje -->
+      <div class="eye-column">
+        <div class="eyebrow" id="brow-l"></div>
+        <div class="eye-socket" id="eye-socket-l">
+          <div class="pupil-track" id="pupil-l">
+            <div class="pupil"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Højre øje -->
+      <div class="eye-column">
+        <div class="eyebrow" id="brow-r"></div>
+        <div class="eye-socket" id="eye-socket-r">
+          <div class="pupil-track" id="pupil-r">
+            <div class="pupil"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mund -->
+    <div class="mouth" id="mouth"></div>
+  </main>
+
+  <!-- Holografisk tale-HUD -->
+  <div class="speech-hud" id="speech-hud">
+    <div class="hud-badge">
+      <span class="hud-badge-dot"></span>
+      <span id="hud-status">SENESTE OPDATERING</span>
+    </div>
+    <div class="hud-headline" id="hud-text">Indlæser overskrift...</div>
+    <div class="hud-time" id="hud-timestamp">Synkroniserer...</div>
+  </div>
+
+  <script>
+    /* DOM Elementer */
+    const pupilLeft = document.getElementById('pupil-l');
+    const pupilRight = document.getElementById('pupil-r');
+    const browLeft = document.getElementById('brow-l');
+    const browRight = document.getElementById('brow-r');
+    const socketLeft = document.getElementById('eye-socket-l');
+    const socketRight = document.getElementById('eye-socket-r');
+    const face = document.getElementById('face');
+    const scanner = document.getElementById('scanner');
+    const cyberBug = document.getElementById('cyber-bug');
+    const sunglasses = document.getElementById('sunglasses');
+    const thoughtBubble = document.getElementById('thought-bubble');
+    const matrixLines = document.getElementById('matrix-lines');
+    const sysStatus = document.getElementById('sys-status');
+    const liveClock = document.getElementById('live-clock');
+    const coffeeBar = document.getElementById('coffee-bar');
+    const coffeePct = document.getElementById('coffee-pct');
+
+    // Opdatering af levende ur og tilfældigt kaffe-niveau
+    function updateClock() {
+      const now = new Date();
+      liveClock.textContent = now.toTimeString().split(' ')[0];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Spontane sjove robot-tanker
+    const robotThoughts = [
+      "Scanner lokalet for kaffe...",
+      "Er det mon snart fyraften? 🤔",
+      "Beregner meningen med livet: 42.",
+      "Husk at strække benene, menneske!",
+      "Beep boop... Bare rolig, jeg planlægger ikke verdensherredømmet.",
+      "Kører på 98% ren nysgerrighed.",
+      "Har nogen set min oplader?",
+      "Overvåger kaffemaskinen intenst..."
+    ];
+
+    function showThought(text, duration = 4000) {
+      thoughtBubble.textContent = text;
+      thoughtBubble.classList.add('show');
+      setTimeout(() => {
+        thoughtBubble.classList.remove('show');
+      }, duration);
+    }
+
+    // Autonome kigge-positioner [x %, y %, bryn-rotation-venstre, bryn-rotation-højre, bryn-Y]
+    const gazePatterns = [
+      { x: 0,   y: 0,   bL: 0,   bR: 0,   bY: 0,   desc: 'Center' },
+      { x: -35, y: -5,  bL: -5,  bR: -3,  bY: -2,  desc: 'Venstre' },
+      { x: 35,  y: -5,  bL: 3,   bR: 5,   bY: -2,  desc: 'Højre' },
+      { x: 0,   y: -30, bL: 8,   bR: -8,  bY: -8,  desc: 'Nysgerrig op' },
+      { x: -28, y: -25, bL: 12,  bR: -4,  bY: -6,  desc: 'Tænker skråt op venstre' },
+      { x: 28,  y: -25, bL: -4,  bR: 12,  bY: -6,  desc: 'Tænker skråt op højre' },
+      { x: 0,   y: 22,  bL: -4,  bR: 4,   bY: 4,   desc: 'Kigger nedad' },
+      { x: -22, y: 18,  bL: -6,  bR: 2,   bY: 3,   desc: 'Skråt ned venstre' },
+      { x: 22,  y: 18,  bL: 2,   bR: -6,  bY: 3,   desc: 'Skråt ned højre' },
+    ];
+
+    let isBusyWithEvent = false;
+
+    // SKETCH 1: Cyber-fluen der svirrer og får ham til at skele!
+    function triggerFlyEvent() {
+      isBusyWithEvent = true;
+      cyberBug.style.opacity = '1';
+
+      const waypoints = [
+        { x: window.innerWidth * 0.2, y: window.innerHeight * 0.35, pupilX: -30, pupilY: -20 },
+        { x: window.innerWidth * 0.8, y: window.innerHeight * 0.25, pupilX: 35,  pupilY: -30 },
+        { x: window.innerWidth * 0.7, y: window.innerHeight * 0.65, pupilX: 30,  pupilY: 25 },
+        { x: window.innerWidth * 0.3, y: window.innerHeight * 0.6,  pupilX: -25, pupilY: 20 },
+        // Lige på næsen: Robottens øjne skeler mod midten!
+        { x: window.innerWidth * 0.5, y: window.innerHeight * 0.52, crossEyed: true }
+      ];
+
+      let step = 0;
+      function nextFlyStep() {
+        if (step < waypoints.length) {
+          const pt = waypoints[step];
+          cyberBug.style.transform = `translate(${pt.x}px, ${pt.y}px)`;
+
+          if (pt.crossEyed) {
+            // Skel med øjnene!
+            pupilLeft.style.transform = 'translate(35%, 15%)';
+            pupilRight.style.transform = 'translate(-35%, 15%)';
+            browLeft.style.transform = 'rotate(18deg) translateY(-8px)';
+            browRight.style.transform = 'rotate(-18deg) translateY(-8px)';
+            showThought('Øh... hvad er det på min næse?!', 2400);
+
+            // Efter 1.8 sekund ryster han fluen af
+            setTimeout(() => {
+              cyberBug.style.transform = `translate(${window.innerWidth * 1.2}px, -100px)`;
+              // Hurtigt ryst med hovedet
+              face.style.transform = 'translateX(-15px)';
+              setTimeout(() => face.style.transform = 'translateX(15px)', 90);
+              setTimeout(() => face.style.transform = 'translateX(0)', 180);
+
+              setTimeout(() => {
+                cyberBug.style.opacity = '0';
+                isBusyWithEvent = false;
+              }, 600);
+            }, 1800);
+          } else {
+            pupilLeft.style.transform = `translate(${pt.pupilX}%, ${pt.pupilY}%)`;
+            pupilRight.style.transform = `translate(${pt.pupilX}%, ${pt.pupilY}%)`;
+            step++;
+            setTimeout(nextFlyStep, 700 + Math.random() * 400);
+          }
+        }
+      }
+
+      nextFlyStep();
+    }
+
+    // SKETCH 2: Træt, gaber og taber gejsten med Zzz
+    function triggerDrowsyEvent() {
+      isBusyWithEvent = true;
+      face.classList.add('sleepy');
+      showThought('Gaaab... energispare-tilstand aktiveret...', 3500);
+
+      // Skab et par svævende Z'er
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const z = document.createElement('div');
+          z.className = 'zzz-particle';
+          z.textContent = 'Z';
+          z.style.left = `${window.innerWidth * 0.55 + (i * 20)}px`;
+          z.style.top = `${window.innerHeight * 0.45 - (i * 15)}px`;
+          document.body.appendChild(z);
+          setTimeout(() => z.remove(), 3000);
+        }, i * 900);
+      }
+
+      // Vågn brat op efter 4 sekunder!
+      setTimeout(() => {
+        face.classList.remove('sleepy');
+        // Vågn op med et spjæt og store pupiller
+        socketLeft.classList.add('blinking');
+        socketRight.classList.add('blinking');
+        setTimeout(() => {
+          socketLeft.classList.remove('blinking');
+          socketRight.classList.remove('blinking');
+          pupilLeft.style.transform = 'scale(1.3)';
+          pupilRight.style.transform = 'scale(1.3)';
+          browLeft.style.transform = 'rotate(15deg) translateY(-12px)';
+          browRight.style.transform = 'rotate(-15deg) translateY(-12px)';
+          showThought('JEG ER VÅGEN! Fuld opmærksomhed!', 2500);
+          setTimeout(() => {
+            pupilLeft.style.transform = 'none';
+            pupilRight.style.transform = 'none';
+            isBusyWithEvent = false;
+          }, 2000);
+        }, 150);
+      }, 4200);
+    }
+
+    // SKETCH 3: Hjerte-øjne og cute forelskelse
+    function triggerHeartEyes() {
+      isBusyWithEvent = true;
+      face.classList.add('happy');
+      socketLeft.classList.add('hearts');
+      socketRight.classList.add('hearts');
+      showThought('Årh, hvor er I søde! ❤️', 3200);
+
+      setTimeout(() => {
+        face.classList.remove('happy');
+        socketLeft.classList.remove('hearts');
+        socketRight.classList.remove('hearts');
+        isBusyWithEvent = false;
+      }, 4000);
+    }
+
+    // SKETCH 4: "Deal with it" solbriller
+    function triggerSunglassesEvent() {
+      isBusyWithEvent = true;
+      sunglasses.classList.add('drop');
+      showThought('100% cool. Deal with it. 😎', 3800);
+
+      setTimeout(() => {
+        sunglasses.classList.remove('drop');
+        isBusyWithEvent = false;
+      }, 4500);
+    }
+
+    // SKETCH 5: Matrix Glitch & System Reboot
+    function triggerGlitchEvent() {
+      isBusyWithEvent = true;
+      face.classList.add('glitch');
+      matrixLines.classList.add('active');
+      sysStatus.textContent = 'FEJL: 0x889F';
+      sysStatus.style.color = '#ff3366';
+
+      setTimeout(() => {
+        // Skærm genstarter
+        face.classList.remove('glitch');
+        matrixLines.classList.remove('active');
+        sysStatus.textContent = 'REBOOT...';
+
+        setTimeout(() => {
+          sysStatus.textContent = 'AKTIV';
+          sysStatus.style.color = '#6eff9f';
+          showThought('System genstartet. Hukommelse optimeret!', 2800);
+          isBusyWithEvent = false;
+        }, 1000);
+      }, 1600);
+    }
+
+    /* URL og data-hentning */
+    const TARGET_FEED_URL = 'https://cdn.zeitcloud.io/prod/i1gt/uja9/wtnw/kzl5/main.html';
+    const FETCH_INTERVAL_MS = 3 * 60 * 1000; // Hver 3. minut
+    let lastAnnouncedHeadline = '';
+
+    // Henter og parser HTML-siden
+    async function fetchHeadline() {
+      let html = '';
+      const cacheBust = Date.now();
+
+      // Forsøg 1: Direkte hentning
+      try {
+        const response = await fetch(`${TARGET_FEED_URL}?t=${cacheBust}`);
+        if (response.ok) {
+          html = await response.text();
+        }
+      } catch (err) {
+        // Direkte fejler typisk pga. CORS i visse browser/kiosk-miljøer
+      }
+
+      // Forsøg 2: CORS Proxy fallback hvis nødvendigt
+      if (!html) {
+        try {
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(TARGET_FEED_URL + '?t=' + cacheBust)}`;
+          const proxyRes = await fetch(proxyUrl);
+          if (proxyRes.ok) {
+            html = await proxyRes.text();
+          }
+        } catch (e) {
+          try {
+            const proxy2 = `https://corsproxy.io/?url=${encodeURIComponent(TARGET_FEED_URL + '?t=' + cacheBust)}`;
+            const res2 = await fetch(proxy2);
+            if (res2.ok) html = await res2.text();
+          } catch (e2) {
+            console.warn('Kunne ikke hente siden:', e2);
+          }
+        }
+      }
+
+      if (!html) return null;
+
+      // Piller HTML fra hinanden og finder overskriften
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Søg efter typiske overskrifts-tags og klasser i Zeitcloud-skabelonen
+        const candidateSelectors = [
+          'h1', 'h2', 'h3',
+          '.headline', '.title', '#title', '#headline',
+          '[class*="headline"]', '[class*="title"]',
+          '.slide-title', '.main-title',
+          'p', 'title'
+        ];
+
+        for (const selector of candidateSelectors) {
+          const el = doc.querySelector(selector);
+          if (el) {
+            const text = el.textContent.trim();
+            if (text.length >= 4 && !text.includes('{') && !text.includes('function')) {
+              return text;
+            }
+          }
+        }
+
+        // Fallback: tag den første meningsfulde tekstblok
+        const textElements = Array.from(doc.querySelectorAll('div, span, b, strong'))
+          .map(el => el.textContent.trim())
+          .filter(t => t.length > 5 && t.length < 160 && !t.includes('{'));
+
+        if (textElements.length > 0) {
+          return textElements[0];
+        }
+      } catch (parseErr) {
+        console.error('Fejl ved parsing af HTML:', parseErr);
+      }
+
+      return null;
+    }
+
+    // Får robotten til at læse overskriften op
+    function announceHeadline(headlineText) {
+      if (!headlineText) return;
+      isBusyWithEvent = true;
+
+      const hud = document.getElementById('speech-hud');
+      const hudText = document.getElementById('hud-text');
+      const hudTimestamp = document.getElementById('hud-timestamp');
+
+      const now = new Date();
+      const timeString = `Opdateret ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      hudTimestamp.textContent = timeString;
+
+      // Væk robotten til live: Kig ned mod meddelelsen med opmærksomme bryn
+      face.classList.remove('happy');
+      face.classList.add('speaking');
+      pupilLeft.style.transform = 'translate(0%, 16%)';
+      pupilRight.style.transform = 'translate(0%, 16%)';
+      browLeft.style.transform = 'rotate(-6deg) translateY(-4px)';
+      browRight.style.transform = 'rotate(6deg) translateY(-4px)';
+
+      // Vis tale-HUD
+      hud.classList.add('visible');
+      hudText.textContent = '';
+
+      // Typewriter-effekt for at gøre teksten spændende at se blive genereret
+      let charIdx = 0;
+      const cleanHeadline = headlineText.replace(/\s+/g, ' ');
+      const typeSpeed = Math.max(25, Math.min(50, 2000 / cleanHeadline.length));
+
+      const typeInterval = setInterval(() => {
+        if (charIdx < cleanHeadline.length) {
+          hudText.textContent += cleanHeadline.charAt(charIdx);
+          charIdx++;
+        } else {
+          clearInterval(typeInterval);
+        }
+      }, typeSpeed);
+
+      // Web Speech API (Dansk oplæsning, hvis skærmen/enheden har lyd aktiveret)
+      let speechDuration = Math.max(5000, cleanHeadline.length * 80);
+      let didSpeakAudio = false;
+
+      if ('speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(cleanHeadline);
+          utterance.lang = 'da-DK';
+          utterance.pitch = 1.25; // Sød robotagtig tone
+          utterance.rate = 0.95;
+
+          // Find dansk stemme hvis tilgængelig i browseren
+          const voices = window.speechSynthesis.getVoices();
+          const danishVoice = voices.find(v => v.lang && v.lang.startsWith('da'));
+          if (danishVoice) utterance.voice = danishVoice;
+
+          utterance.onend = () => finishSpeaking();
+          utterance.onerror = () => finishSpeaking();
+
+          window.speechSynthesis.speak(utterance);
+          didSpeakAudio = true;
+        } catch (e) {
+          didSpeakAudio = false;
+        }
+      }
+
+      if (!didSpeakAudio) {
+        setTimeout(finishSpeaking, speechDuration);
+      }
+
+      function finishSpeaking() {
+        face.classList.remove('speaking');
+        // Lad taleboblen stå synlig i 7 sekunder efter oplæsningen, så forbipasserende når at læse den
+        setTimeout(() => {
+          hud.classList.remove('visible');
+          isBusyWithEvent = false;
+        }, 7000);
+      }
+    }
+
+    // Periodisk trigger
+    async function checkFeedAndSpeak() {
+      const headline = await fetchHeadline();
+      if (headline) {
+        lastAnnouncedHeadline = headline;
+        announceHeadline(headline);
+      }
+    }
+
+    function performGaze() {
+      if (isBusyWithEvent) {
+        setTimeout(performGaze, 1500);
+        return;
+      }
+
+      // Vælg et tilfældigt blik
+      const target = gazePatterns[Math.floor(Math.random() * gazePatterns.length)];
+
+      pupilLeft.style.transform = `translate(${target.x}%, ${target.y}%)`;
+      pupilRight.style.transform = `translate(${target.x}%, ${target.y}%)`;
+
+      browLeft.style.transform = `rotate(${target.bL}deg) translateY(${target.bY}px)`;
+      browRight.style.transform = `rotate(${target.bR}deg) translateY(${target.bY}px)`;
+
+      // Tilfældigt tidsrum før næste blik (1.8s til 4.2s for naturlig rytme)
+      const nextDelay = 1800 + Math.random() * 2400;
+      setTimeout(performGaze, nextDelay);
+    }
+
+    function performBlink() {
+      if (face.classList.contains('happy')) {
+        setTimeout(performBlink, 2000);
+        return;
+      }
+
+      socketLeft.classList.add('blinking');
+      socketRight.classList.add('blinking');
+
+      setTimeout(() => {
+        socketLeft.classList.remove('blinking');
+        socketRight.classList.remove('blinking');
+
+        // 30% chance for et øjeblikkeligt sødt dobbelt-blink
+        if (Math.random() < 0.3) {
+          setTimeout(() => {
+            socketLeft.classList.add('blinking');
+            socketRight.classList.add('blinking');
+            setTimeout(() => {
+              socketLeft.classList.remove('blinking');
+              socketRight.classList.remove('blinking');
+            }, 120);
+          }, 140);
+        }
+      }, 140);
+
+      // Næste blink efter 3 til 6.5 sekunder
+      const nextBlink = 3000 + Math.random() * 3500;
+      setTimeout(performBlink, nextBlink);
+    }
+
+    // Autonome mikro-begivenheder: Glad smil, nysgerrig scanning, let forundring
+    function triggerRandomMicroEvent() {
+      if (isBusyWithEvent) return;
+
+      const events = [
+        'flyChase',
+        'drowsy',
+        'heartEyes',
+        'sunglasses',
+        'glitchReboot',
+        'happyGlance',
+        'scannerSweep',
+        'curiousTilt',
+        'randomThought'
+      ];
+      const chosenEvent = events[Math.floor(Math.random() * events.length)];
+
+      if (chosenEvent === 'flyChase') {
+        triggerFlyEvent();
+      } else if (chosenEvent === 'drowsy') {
+        triggerDrowsyEvent();
+      } else if (chosenEvent === 'heartEyes') {
+        triggerHeartEyes();
+      } else if (chosenEvent === 'sunglasses') {
+        triggerSunglassesEvent();
+      } else if (chosenEvent === 'glitchReboot') {
+        triggerGlitchEvent();
+      } else if (chosenEvent === 'randomThought') {
+        const t = robotThoughts[Math.floor(Math.random() * robotThoughts.length)];
+        showThought(t, 3800);
+      } else if (chosenEvent === 'happyGlance') {
+        // Robotten lukker øjnene i et tilfreds smil og rødmer svagt
+        isBusyWithEvent = true;
+        face.classList.add('happy');
+        browLeft.style.transform = 'rotate(-12deg) translateY(-8px)';
+        browRight.style.transform = 'rotate(12deg) translateY(-8px)';
+
+        setTimeout(() => {
+          face.classList.remove('happy');
+          isBusyWithEvent = false;
+        }, 3200);
+
+      } else if (chosenEvent === 'scannerSweep') {
+        // En laser-linje scanner roligt over skærmen
+        scanner.classList.add('active');
+        pupilLeft.style.transform = 'translate(0%, -20%)';
+        pupilRight.style.transform = 'translate(0%, -20%)';
+
+        setTimeout(() => {
+          pupilLeft.style.transform = 'translate(0%, 25%)';
+          pupilRight.style.transform = 'translate(0%, 25%)';
+        }, 1100);
+
+        setTimeout(() => {
+          scanner.classList.remove('active');
+        }, 2300);
+
+      } else if (chosenEvent === 'curiousTilt') {
+        // Robotten lægger hovedet lidt på skrå med asymmetriske bryn
+        browLeft.style.transform = 'rotate(-16deg) translateY(-12px)';
+        browRight.style.transform = 'rotate(8deg) translateY(4px)';
+        pupilLeft.style.transform = 'translate(10%, -15%)';
+        pupilRight.style.transform = 'translate(10%, -15%)';
+
+        setTimeout(() => {
+          browLeft.style.transform = 'none';
+          browRight.style.transform = 'none';
+        }, 2600);
+      }
+
+      // Let dynamisk justering af kaffe-niveauet
+      const rndCoffee = Math.floor(10 + Math.random() * 40);
+      coffeeBar.style.width = `${rndCoffee}%`;
+      coffeePct.textContent = `${rndCoffee}%`;
+
+      // Kør et nyt event hvert 10. til 20. sekund for masser af liv
+      const nextEventDelay = 10000 + Math.random() * 10000;
+      setTimeout(triggerRandomMicroEvent, nextEventDelay);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Start blikcyklus
+      setTimeout(performGaze, 1000);
+      // Start blinkecyklus
+      setTimeout(performBlink, 2200);
+      // Start mikro-events
+      setTimeout(triggerRandomMicroEvent, 5000);
+
+      // Hent og læs første overskrift 3 sekunder efter opstart
+      setTimeout(checkFeedAndSpeak, 3000);
+
+      // Gentag hver 3. minut
+      setInterval(checkFeedAndSpeak, FETCH_INTERVAL_MS);
+    });
+  </script>
+</body>
+</html>
