@@ -577,7 +577,7 @@
       <span id="coffee-pct">18%</span>
     </div>
     <div class="status-item">
-      <span id="live-clock">12:00:00</span>
+      <span id="live-clock">--:--:--</span>
     </div>
   </div>
 
@@ -668,10 +668,16 @@
     const coffeeBar = document.getElementById('coffee-bar');
     const coffeePct = document.getElementById('coffee-pct');
 
-    // Opdatering af levende ur og tilfældigt kaffe-niveau
+    // Opdatering af levende ur fastlåst til dansk tidszone (Europe/Copenhagen)
     function updateClock() {
       const now = new Date();
-      liveClock.textContent = now.toTimeString().split(' ')[0];
+      liveClock.textContent = now.toLocaleTimeString('da-DK', {
+        timeZone: 'Europe/Copenhagen',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
     setInterval(updateClock, 1000);
     updateClock();
@@ -947,7 +953,7 @@
       const hudTimestamp = document.getElementById('hud-timestamp');
 
       const now = new Date();
-      const timeString = `Opdateret ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const timeString = `Opdateret ${now.toLocaleTimeString('da-DK', { timeZone: 'Europe/Copenhagen', hour: '2-digit', minute: '2-digit' })}`;
       hudTimestamp.textContent = timeString;
 
       // Væk robotten til live: Kig ned mod meddelelsen med opmærksomme bryn
